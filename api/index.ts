@@ -1,4 +1,4 @@
-import { createServer } from '@vercel/node';
 import app from '../server/index';
 
-export default createServer(app); 
+// Export the Express app directly for Vercel's Node runtime
+export default app;
