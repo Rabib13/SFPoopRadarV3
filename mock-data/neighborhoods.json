@@ -1,9 +1,30 @@
 [
-  {"name": "Tenderloin", "count": 12},
-  {"name": "SOMA", "count": 9},
-  {"name": "Mission", "count": 7},
-  {"name": "Castro", "count": 5},
-  {"name": "Financial District", "count": 3},
-  {"name": "Union Square", "count": 4},
-  {"name": "Nob Hill", "count": 2}
+  {
+    "name": "Tenderloin",
+    "count": 20
+  },
+  {
+    "name": "SOMA",
+    "count": 9
+  },
+  {
+    "name": "Mission",
+    "count": 7
+  },
+  {
+    "name": "Castro",
+    "count": 5
+  },
+  {
+    "name": "Financial District",
+    "count": 3
+  },
+  {
+    "name": "Union Square",
+    "count": 4
+  },
+  {
+    "name": "Nob Hill",
+    "count": 2
+  }
 ]
