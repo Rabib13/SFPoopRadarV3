@@ -5,9 +5,10 @@ import { insertIncidentSchema } from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  
+  const prefix = process.env.VERCEL ? "" : "/api";
+
   // Get all incidents
-  app.get("/api/incidents", async (req, res) => {
+  app.get(`${prefix}/incidents`, async (req, res) => {
     try {
       const incidents = await storage.getAllIncidents();
       res.json(incidents);
@@ -17,7 +18,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get incident by ID
-  app.get("/api/incidents/:id", async (req, res) => {
+  app.get(`${prefix}/incidents/:id`, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const incident = await storage.getIncidentById(id);
@@ -33,7 +34,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create new incident
-  app.post("/api/incidents", async (req, res) => {
+  app.post(`${prefix}/incidents`, async (req, res) => {
     try {
       const validation = insertIncidentSchema.safeParse(req.body);
       
@@ -52,7 +53,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get incidents by neighborhood
-  app.get("/api/incidents/neighborhood/:name", async (req, res) => {
+  app.get(`${prefix}/incidents/neighborhood/:name`, async (req, res) => {
     try {
       const incidents = await storage.getIncidentsByNeighborhood(req.params.name);
       res.json(incidents);
@@ -62,7 +63,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get recent incidents
-  app.get("/api/incidents/recent", async (req, res) => {
+  app.get(`${prefix}/incidents/recent`, async (req, res) => {
     try {
       const incidents = await storage.getRecentIncidents();
       res.json(incidents);
@@ -72,7 +73,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get all neighborhoods
-  app.get("/api/neighborhoods", async (req, res) => {
+  app.get(`${prefix}/neighborhoods`, async (req, res) => {
     try {
       const neighborhoods = await storage.getAllNeighborhoods();
       res.json(neighborhoods);
@@ -82,7 +83,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get today's stats
-  app.get("/api/stats/today", async (req, res) => {
+  app.get(`${prefix}/stats/today`, async (req, res) => {
     try {
       const stats = await storage.getTodaysStats();
       res.json(stats);
