@@ -1,6 +1,10 @@
+import { fileURLToPath } from 'url';
+import path from 'path';
+import fs from 'fs';
 import { users, incidents, neighborhoods, type User, type InsertUser, type Incident, type InsertIncident, type Neighborhood, type InsertNeighborhood } from "@shared/schema";
-import fs from "fs";
-import path from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Dynamically resolve mock-data path for both dev and prod
 const isProd = process.env.NODE_ENV === "production";
