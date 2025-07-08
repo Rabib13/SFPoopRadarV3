@@ -1,8 +1,19 @@
 import { users, incidents, neighborhoods, type User, type InsertUser, type Incident, type InsertIncident, type Neighborhood, type InsertNeighborhood } from "@shared/schema";
-// Importing JSON using the `with` assertion keeps the syntax compatible with
-// both modern Node versions and bundlers used by serverless platforms.
-import neighborhoodsData from "../mock-data/neighborhoods.json" with { type: "json" };
-import incidentsData from "../mock-data/incidents.json" with { type: "json" };
+import fs from "fs";
+import path from "path";
+
+// Dynamically resolve mock-data path for both dev and prod
+const isProd = process.env.NODE_ENV === "production";
+const baseDir = isProd
+  ? path.resolve(__dirname, "../mock-data")
+  : path.resolve(__dirname, "../mock-data");
+
+const neighborhoodsData = JSON.parse(
+  fs.readFileSync(path.join(baseDir, "neighborhoods.json"), "utf-8")
+);
+const incidentsData = JSON.parse(
+  fs.readFileSync(path.join(baseDir, "incidents.json"), "utf-8")
+);
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -53,7 +64,7 @@ export class MemStorage implements IStorage {
   }
 
   private initializeNeighborhoods() {
-    neighborhoodsData.forEach(neighborhood => {
+    neighborhoodsData.forEach((neighborhood: any) => {
       const id = this.currentNeighborhoodId++;
       this.neighborhoods.set(neighborhood.name, {
         id,
@@ -64,7 +75,7 @@ export class MemStorage implements IStorage {
   }
 
   private initializeIncidents() {
-    incidentsData.forEach(incident => {
+    incidentsData.forEach((incident: any) => {
       const id = this.currentIncidentId++;
       this.incidents.set(id, {
         ...incident,
