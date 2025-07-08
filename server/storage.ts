@@ -1,6 +1,8 @@
 import { users, incidents, neighborhoods, type User, type InsertUser, type Incident, type InsertIncident, type Neighborhood, type InsertNeighborhood } from "@shared/schema";
-import neighborhoodsData from "../mock-data/neighborhoods.json" assert { type: "json" };
-import incidentsData from "../mock-data/incidents.json" assert { type: "json" };
+// Importing JSON using the `with` assertion keeps the syntax compatible with
+// both modern Node versions and bundlers used by serverless platforms.
+import neighborhoodsData from "../mock-data/neighborhoods.json" with { type: "json" };
+import incidentsData from "../mock-data/incidents.json" with { type: "json" };
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
