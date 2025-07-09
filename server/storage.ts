@@ -6,18 +6,86 @@ import { users, incidents, neighborhoods, type User, type InsertUser, type Incid
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Dynamically resolve mock-data path for both dev and prod
-const isProd = process.env.NODE_ENV === "production";
-const baseDir = isProd
-  ? path.resolve(__dirname, "../mock-data")
-  : path.resolve(__dirname, "../mock-data");
+function log(...args: any[]) {
+  // eslint-disable-next-line no-console
+  console.log('[storage]', ...args);
+}
 
-const neighborhoodsData = JSON.parse(
-  fs.readFileSync(path.join(baseDir, "neighborhoods.json"), "utf-8")
-);
-const incidentsData = JSON.parse(
-  fs.readFileSync(path.join(baseDir, "incidents.json"), "utf-8")
-);
+function tryLoadJson(possiblePaths: string[], label: string) {
+  for (const p of possiblePaths) {
+    log(`Trying to load ${label} from: ${p}`);
+    if (fs.existsSync(p)) {
+      log(`Found ${label} at: ${p}`);
+      try {
+        return JSON.parse(fs.readFileSync(p, 'utf-8'));
+      } catch (err) {
+        log(`Error reading ${label} at ${p}:`, err);
+      }
+    } else {
+      log(`File does not exist: ${p}`);
+    }
+  }
+  log(`Could not find ${label} in any known location. Using fallback data.`);
+  return null;
+}
+
+function loadMockData() {
+  const cwd = process.cwd();
+  log('process.cwd():', cwd);
+  log('__dirname:', __dirname);
+
+  // Possible locations for mock data
+  const possibleDirs = [
+    path.resolve(__dirname, '../mock-data'),
+    path.resolve(__dirname, '../../mock-data'),
+    path.resolve(cwd, 'dist/mock-data'),
+    path.resolve(cwd, 'mock-data'),
+    path.resolve(cwd, '../mock-data'),
+  ];
+  const neighborhoodsPaths = possibleDirs.map(dir => path.join(dir, 'neighborhoods.json'));
+  const incidentsPaths = possibleDirs.map(dir => path.join(dir, 'incidents.json'));
+
+  const neighborhoodsData = tryLoadJson(neighborhoodsPaths, 'neighborhoods.json') || [
+    { name: 'Tenderloin', count: 20 },
+    { name: 'SOMA', count: 9 },
+    { name: 'Mission', count: 7 },
+    { name: 'Castro', count: 5 },
+    { name: 'Financial District', count: 3 },
+    { name: 'Union Square', count: 4 },
+    { name: 'Nob Hill', count: 2 },
+  ];
+  const incidentsData = tryLoadJson(incidentsPaths, 'incidents.json') || [
+    {
+      type: 'human',
+      latitude: '37.7850',
+      longitude: '-122.4120',
+      location: 'Geary St & Leavenworth St',
+      neighborhood: 'Tenderloin',
+      reporter: 'Anonymous',
+      status: 'pending',
+      minutesAgo: 2,
+      isRecent: true,
+    },
+    {
+      type: 'human',
+      latitude: '37.7845',
+      longitude: '-122.4110',
+      location: 'Eddy St & Hyde St',
+      neighborhood: 'Tenderloin',
+      reporter: 'Anonymous',
+      status: 'pending',
+      minutesAgo: 5,
+      isRecent: true,
+    },
+  ];
+
+  log(`Loaded neighborhoods: ${Array.isArray(neighborhoodsData) ? neighborhoodsData.length : 0}`);
+  log(`Loaded incidents: ${Array.isArray(incidentsData) ? incidentsData.length : 0}`);
+
+  return { neighborhoodsData, incidentsData };
+}
+
+const { neighborhoodsData, incidentsData } = loadMockData();
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
