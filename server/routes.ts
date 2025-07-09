@@ -91,6 +91,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Debug endpoint to inspect file system and environment in production
+  app.get("/api/debug", async (req, res) => {
+    const fs = await import('fs');
+    const path = await import('path');
+
+    const debug: any = {
+      cwd: process.cwd(),
+      __dirname: typeof import.meta.dirname !== 'undefined' ? import.meta.dirname : 'undefined',
+      nodeEnv: process.env.NODE_ENV,
+      platform: process.platform,
+      files: [],
+      mockDataPaths: []
+    };
+
+    // Try to read current directory
+    try {
+      debug.files = fs.readdirSync(process.cwd());
+    } catch (e: any) {
+      debug.files = [`Error: ${e.message}`];
+    }
+
+    // Check all possible mock data paths
+    const possiblePaths = [
+      path.resolve(process.cwd(), "mock-data"),
+      path.resolve(process.cwd(), "dist/mock-data"),
+      path.resolve(typeof import.meta.dirname !== 'undefined' ? import.meta.dirname : '.', "../mock-data"),
+      "./mock-data",
+      "./dist/mock-data"
+    ];
+
+    for (const mockPath of possiblePaths) {
+      try {
+        const exists = fs.existsSync(mockPath);
+        const contents = exists ? fs.readdirSync(mockPath) : null;
+        debug.mockDataPaths.push({ path: mockPath, exists, contents });
+      } catch (e: any) {
+        debug.mockDataPaths.push({ path: mockPath, error: e.message });
+      }
+    }
+
+    res.json(debug);
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
